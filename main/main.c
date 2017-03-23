@@ -35,12 +35,12 @@ void app_main(void) {
     nvs_flash_init();
     tcpip_adapter_init();
 
-    // WiFi STA configuration
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-
     // Start ESP main event loop
     ESP_LOGI(TAG, "Starting wroomba software v%s", VER);
     ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL) );
+
+    // WiFi STA configuration
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 
     // Check start and connect WiFi
     ESP_ERROR_CHECK(esp_wifi_init(&cfg) );
@@ -61,6 +61,7 @@ void app_main(void) {
         &xHandle
     );
 
+    // Give some feedback to our task
     if (xReturned == pdPASS) {
         ESP_LOGI(TAG, "Successfully created main task");
     } else {
