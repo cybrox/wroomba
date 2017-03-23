@@ -8,7 +8,7 @@ void vATaskWroomba(void *pvParameters) {
     // Wait until we have a WiFi connection
     xEventGroupWaitBits(
       xWiFiEventGroup,
-      BIT_CONNECTED,
+      (BIT_CONNECTED | BIT_DISCONNECTED),
       CLEAR_BITS_FALSE,
       WAIT_ALL_BITS_FALSE,
       SECONDS(10)
