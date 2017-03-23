@@ -6,6 +6,7 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
+#include "secret/wifi.h"
 
 
 // Static file tag identifier
@@ -36,13 +37,6 @@ void app_main(void) {
 
     // WiFi STA configuration
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    wifi_config_t sta_config = {
-        .sta = {
-            .ssid = "access_point_name",
-            .password = "password",
-            .bssid_set = false
-        }
-    };
 
     // Start ESP main event loop
     ESP_LOGI(TAG, "Starting wroomba software v%s", VER);
