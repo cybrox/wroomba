@@ -18,16 +18,24 @@ esp_err_t event_handler(void *ctx, system_event_t *event) {
 }
 
 
-void app_main(void) {
-    ESP_LOGI(TAG, "Starting wroomba software v%s", VER);
+void vATaskFunction(void *pvParameters) {
+    const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
+    for(;;) {
+        ESP_LOGI(TAG, "Doing some stuff!");
+        vTaskDelay(xDelay);
+    }
+
+    vTaskDelete(NULL);
+}
+
+
+void app_main(void) {
     nvs_flash_init();
     tcpip_adapter_init();
-    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
+
+    // WiFi STA configuration
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
-    ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
     wifi_config_t sta_config = {
         .sta = {
             .ssid = "access_point_name",
@@ -35,9 +43,35 @@ void app_main(void) {
             .bssid_set = false
         }
     };
-    ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_STA, &sta_config) );
-    ESP_ERROR_CHECK( esp_wifi_start() );
-    ESP_ERROR_CHECK( esp_wifi_connect() );
+
+    // Start ESP main event loop
+    ESP_LOGI(TAG, "Starting wroomba software v%s", VER);
+    ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL) );
+
+    // Check start and connect WiFi
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg) );
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM) );
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config) );
+    ESP_ERROR_CHECK(esp_wifi_start() );
+    ESP_ERROR_CHECK(esp_wifi_connect() );
+
+    // Create our main wroomba task
+    TaskHandle_t xHandle = NULL;
+    BaseType_t xReturned = xTaskCreate(
+        vATaskFunction,
+        "wroomba",
+        4000, // TODO: Determine actually needed stack depth
+        (void*)1,
+        (2 | portPRIVILEGE_BIT),
+        &xHandle
+    );
+
+    if (xReturned == pdPASS) {
+        ESP_LOGI(TAG, "Successfully created main task");
+    } else {
+        ESP_LOGE(TAG, "Failed to create main task");
+    }
 
     gpio_set_direction(GPIO_NUM_4, GPIO_MODE_OUTPUT);
     int level = 0;
