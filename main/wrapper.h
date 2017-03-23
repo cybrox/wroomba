@@ -3,13 +3,21 @@
 
   #include "freertos/FreeRTOS.h"
   #include "freertos/event_groups.h"
+
   #include "esp_wifi.h"
   #include "esp_system.h"
   #include "esp_event.h"
   #include "esp_event_loop.h"
   #include "esp_log.h"
+
   #include "nvs_flash.h"
+
   #include "driver/gpio.h"
+
+  #include "mdns.h"
+
+
+
 
   #define MILLISECONDS(ms) (ms / portTICK_PERIOD_MS)
   #define SECONDS(s) (MILLISECONDS(s * 1000))
@@ -23,6 +31,10 @@
   #define BIT_READY            0x01
   #define BIT_CONNECTED        0x02
   #define BIT_DISCONNECTED     0x04
+
+  
+  // System Globals
+  mdns_server_t *mdns;
 
 
   // System Tasks

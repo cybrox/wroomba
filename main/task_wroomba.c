@@ -14,6 +14,7 @@ void vATaskWroomba(void *pvParameters) {
       SECONDS(10)
     );
 
+
     // Cancel our task if we have no WiFi connection
     EventBits_t eventGroupBits = xEventGroupGetBits(xWiFiEventGroup);
     if ((eventGroupBits & BIT_CONNECTED) == 0) {
@@ -21,6 +22,13 @@ void vATaskWroomba(void *pvParameters) {
       vTaskDelete(NULL);
       return;
     }
+    
+
+    // Set up mDNS broadcasting
+    ESP_ERROR_CHECK(mdns_init(TCPIP_ADAPTER_IF_STA, &mdns));
+    mdns_set_hostname(mdns, "wroomba");
+    mdns_set_instance(mdns, "wroomba");
+
 
     for(;;) {
         ESP_LOGI(TAG, "Doing some stuff!");
