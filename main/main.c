@@ -19,7 +19,7 @@ esp_err_t event_handler(void *ctx, system_event_t *event) {
 }
 
 
-void vATaskFunction(void *pvParameters) {
+void vATaskWroomba(void *pvParameters) {
     const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 
     for(;;) {
@@ -53,7 +53,7 @@ void app_main(void) {
     // Create our main wroomba task
     TaskHandle_t xHandle = NULL;
     BaseType_t xReturned = xTaskCreate(
-        vATaskFunction,
+        vATaskWroomba,
         "wroomba",
         4000, // TODO: Determine actually needed stack depth
         (void*)1,
