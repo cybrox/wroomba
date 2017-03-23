@@ -1,36 +1,37 @@
-#include "freertos/FreeRTOS.h"
-#include "esp_wifi.h"
-#include "esp_system.h"
-#include "esp_event.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include "driver/gpio.h"
+#include "wrapper.h"
 #include "secret/wifi.h"
+#include "task_wroomba.h"
 
 
 // Static file tag identifier
-static const char* TAG = "wroomba";
+static const char* TAG = "main";
 static const char* VER = "0.1";
 
 
+// System Tasks
+TaskHandle_t xWroombaTask;
+
+
+// System Event Groups
+EventGroupHandle_t xWiFiEventGroup;
+
+
+// ESP Main event handler
+// This will handle all incoming events from the ESP system!
+//
+// parameter ctx: The context in which the event was sent
+// parameter event: The event that was sent from the system
+//
+// returns: ESP_OK
 esp_err_t event_handler(void *ctx, system_event_t *event) {
     return ESP_OK;
 }
 
 
-void vATaskWroomba(void *pvParameters) {
-    const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
-
-    for(;;) {
-        ESP_LOGI(TAG, "Doing some stuff!");
-        vTaskDelay(xDelay);
-    }
-
-    vTaskDelete(NULL);
-}
-
-
+// ESP Main appllication
+// This will be responsible for initializing and configuring our software
+//
+// returns: void
 void app_main(void) {
     nvs_flash_init();
     tcpip_adapter_init();
@@ -51,14 +52,13 @@ void app_main(void) {
     ESP_ERROR_CHECK(esp_wifi_connect() );
 
     // Create our main wroomba task
-    TaskHandle_t xHandle = NULL;
     BaseType_t xReturned = xTaskCreate(
         vATaskWroomba,
         "wroomba",
         4000, // TODO: Determine actually needed stack depth
         (void*)1,
         (2 | portPRIVILEGE_BIT),
-        &xHandle
+        &xWroombaTask
     );
 
     // Give some feedback to our task
