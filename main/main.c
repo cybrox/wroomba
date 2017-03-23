@@ -3,14 +3,24 @@
 #include "esp_system.h"
 #include "esp_event.h"
 #include "esp_event_loop.h"
+#include "esp_log.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
+
+
+// Static file tag identifier
+static const char* TAG = "wroomba";
+static const char* VER = "0.1";
+
 
 esp_err_t event_handler(void *ctx, system_event_t *event) {
     return ESP_OK;
 }
 
+
 void app_main(void) {
+    ESP_LOGI(TAG, "Starting wroomba software v%s", VER);
+
     nvs_flash_init();
     tcpip_adapter_init();
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
