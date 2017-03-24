@@ -1,10 +1,10 @@
-#include "task_udphandler.h"
+#include "task_httphandler.h"
 
-static const char* TAG = "udphandler";
+static const char* TAG = "http_handler";
 
-void handle_tcp_request(struct netconn *connection);
+void handle_http_request(struct netconn *connection);
 
-void vATaskUdpHandler(void *pvParameters) {
+void vATaskHttpHandler(void *pvParameters) {
     // Wait until we have a WiFi connection
     xEventGroupWaitBits(
       xWiFiEventGroup,
@@ -38,7 +38,7 @@ void vATaskUdpHandler(void *pvParameters) {
       err = netconn_accept(conn, &newconn);
       if (err == ERR_OK) {
         ESP_LOGI(TAG, "Received HTTP request!");
-        handle_tcp_request(newconn);
+        handle_http_request(newconn);
         netconn_delete(newconn);
       }
     } while (err == ERR_OK);
@@ -49,7 +49,7 @@ void vATaskUdpHandler(void *pvParameters) {
 const static char http_html_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
 const static char http_index_html[] = "<html><head><title>Congrats!</title></head><body><h1>Welcome to our lwIP HTTP server!</h1><p>This is a small test page, served by httpserver-netconn.</body></html>";
 
-void handle_tcp_request(struct netconn *conn) {
+void handle_http_request(struct netconn *conn) {
   struct netbuf *inbuf;
   char *buf;
   u16_t buflen;
