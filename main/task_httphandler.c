@@ -37,7 +37,7 @@ void vATaskHttpHandler(void *pvParameters) {
     do {
       err = netconn_accept(conn, &newconn);
       if (err == ERR_OK) {
-        ESP_LOGI(TAG, "Received HTTP request!");
+        ESP_LOGI(TAG, "Received HTTP request chunk!");
         handle_http_request(newconn);
         netconn_delete(newconn);
       }
@@ -46,8 +46,11 @@ void vATaskHttpHandler(void *pvParameters) {
     vTaskDelete(NULL);
 }
 
-const static char http_html_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
-const static char http_index_html[] = "<h1>wroom!</h1>";
+static const char header_success[] = "HTTP/1.1 200 OK\r\nContent-type: text\r\n\r\n";
+static const char header_notfound[] = "HTTP/1.1 404 Not Found\r\nContent-type: text\r\n\r\n";
+static const char body_info[] = "wroomba!";
+static const char body_clean[] = "roger!";
+static const char body_nf[] = "not found";
 
 void handle_http_request(struct netconn *conn) {
   struct netbuf *inbuf;
@@ -60,11 +63,27 @@ void handle_http_request(struct netconn *conn) {
   if (err == ERR_OK) {
     netbuf_data(inbuf, (void**)&buf, &buflen);
 
-    // Check if header starts with "GET /"
-    if (buflen >= 5 && buf[0] == 'G' && buf[1] == 'E' && buf[2] == 'T' && buf[3] == ' ' && buf[4] == '/') {
-      netconn_write(conn, http_html_hdr, sizeof(http_html_hdr) - 1, NETCONN_NOCOPY);
-      netconn_write(conn, http_index_html, sizeof(http_index_html) - 1, NETCONN_NOCOPY);
-    }
+    // Router
+    do {
+  
+      // GET /info
+      if (String_hasSegment(buf, "GET /info", 9, 0)) {
+        netconn_write(conn, header_success, sizeof(header_success) - 1, NETCONN_NOCOPY);
+        netconn_write(conn, body_info, sizeof(body_info) - 1, NETCONN_NOCOPY);
+        break;
+      }
+
+      //POST /clean
+      if (String_hasSegment(buf, "POST /clean", 11, 0)) {
+        netconn_write(conn, header_success, sizeof(header_success) - 1, NETCONN_NOCOPY);
+        netconn_write(conn, body_clean, sizeof(body_clean) - 1, NETCONN_NOCOPY);
+        break;
+      }
+
+      ESP_LOGI(TAG, "No route matched, dispatching 404");
+      netconn_write(conn, header_notfound, sizeof(header_notfound) - 1, NETCONN_NOCOPY);
+      netconn_write(conn, body_nf, sizeof(body_nf) - 1, NETCONN_NOCOPY);
+    } while(false);
   }
 
   netconn_close(conn);
