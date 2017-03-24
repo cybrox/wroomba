@@ -60,7 +60,9 @@ void app_main(void) {
 
     // Create our wifi event group
     xWiFiEventGroup = xEventGroupCreate();
+    xCleanEventGroup = xEventGroupCreate();
     xEventGroupClearBits(xWiFiEventGroup, (BIT_READY | BIT_CONNECTED | BIT_DISCONNECTED));
+    xEventGroupClearBits(xCleanEventGroup, (BIT_START_CLEAN | BIT_STOP_CLEAN));
 
     // Create our main wroomba task
     BaseType_t xReturned;

@@ -70,6 +70,7 @@ void handle_http_request(struct netconn *conn) {
       if (String_hasSegment(buf, "GET /info", 9, 0)) {
         netconn_write(conn, header_success, sizeof(header_success) - 1, NETCONN_NOCOPY);
         netconn_write(conn, body_info, sizeof(body_info) - 1, NETCONN_NOCOPY);
+        ESP_LOGI(TAG, "Received info request!");
         break;
       }
 
@@ -77,6 +78,8 @@ void handle_http_request(struct netconn *conn) {
       if (String_hasSegment(buf, "POST /clean", 11, 0)) {
         netconn_write(conn, header_success, sizeof(header_success) - 1, NETCONN_NOCOPY);
         netconn_write(conn, body_clean, sizeof(body_clean) - 1, NETCONN_NOCOPY);
+        ESP_LOGI(TAG, "Received cleaning request!");
+        xEventGroupSetBits(xCleanEventGroup, BIT_START_CLEAN);
         break;
       }
 

@@ -39,6 +39,9 @@
   #define BIT_READY            0x01
   #define BIT_CONNECTED        0x02
   #define BIT_DISCONNECTED     0x04
+  
+  #define BIT_START_CLEAN      0x01
+  #define BIT_STOP_CLEAN       0x02
 
   
   // System Globals
@@ -52,5 +55,6 @@
 
   // System Event Groups
   EventGroupHandle_t xWiFiEventGroup;
+  EventGroupHandle_t xCleanEventGroup;
 
 #endif

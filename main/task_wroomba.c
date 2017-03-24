@@ -31,8 +31,25 @@ void vATaskWroomba(void *pvParameters) {
 
 
     for(;;) {
-        ESP_LOGI(TAG, "Doing some stuff!");
-        vTaskDelay(SECONDS(10));
+      xEventGroupWaitBits(
+        xCleanEventGroup,
+        (BIT_START_CLEAN | BIT_STOP_CLEAN),
+        CLEAR_BITS_FALSE,
+        WAIT_ALL_BITS_FALSE,
+        SECONDS(60)
+      );
+
+
+      EventBits_t eventGroupBits = xEventGroupGetBits(xCleanEventGroup);
+      if ((eventGroupBits & BIT_START_CLEAN) == 1) {
+        ESP_LOGI(TAG, "Sending Command: Start Cleaning!");
+      }
+
+      if ((eventGroupBits & BIT_STOP_CLEAN) == 1) {
+        ESP_LOGI(TAG, "Sending Command: Stop Cleaning!");
+      }
+
+      xEventGroupClearBits(xCleanEventGroup, (BIT_START_CLEAN | BIT_STOP_CLEAN));
     }
 
     vTaskDelete(NULL);
