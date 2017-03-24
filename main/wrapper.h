@@ -43,7 +43,6 @@
   
   // System Globals
   mdns_server_t *mdns;
-  struct udp_pcb *udp_server;
 
 
   // System Tasks

@@ -19,6 +19,8 @@ void vATaskWroomba(void *pvParameters) {
       ESP_LOGE(TAG, "WiFi: Not found, cancelling!");
       vTaskDelete(NULL);
       return;
+    } else {
+      ESP_LOGI(TAG, "Module started successfully!");
     }
     
 

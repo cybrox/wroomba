@@ -2,6 +2,8 @@
 
 static const char* TAG = "udphandler";
 
+void handle_tcp_request(struct netconn *connection);
+
 void vATaskUdpHandler(void *pvParameters) {
     // Wait until we have a WiFi connection
     xEventGroupWaitBits(
@@ -19,8 +21,52 @@ void vATaskUdpHandler(void *pvParameters) {
       ESP_LOGE(TAG, "WiFi: Not found, cancelling!");
       vTaskDelete(NULL);
       return;
+    } else {
+      ESP_LOGI(TAG, "Module started successfully!");
     }
     
 
+    // Start UDP interface
+    struct netconn *conn, *newconn;
+    err_t err;
+
+    conn = netconn_new(NETCONN_TCP);
+    netconn_bind(conn, NULL, 80);
+    netconn_listen(conn);
+
+    do {
+      err = netconn_accept(conn, &newconn);
+      if (err == ERR_OK) {
+        ESP_LOGI(TAG, "Received HTTP request!");
+        handle_tcp_request(newconn);
+        netconn_delete(newconn);
+      }
+    } while (err == ERR_OK);
+
     vTaskDelete(NULL);
+}
+
+const static char http_html_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
+const static char http_index_html[] = "<html><head><title>Congrats!</title></head><body><h1>Welcome to our lwIP HTTP server!</h1><p>This is a small test page, served by httpserver-netconn.</body></html>";
+
+void handle_tcp_request(struct netconn *conn) {
+  struct netbuf *inbuf;
+  char *buf;
+  u16_t buflen;
+  err_t err;
+
+  err = netconn_recv(conn, &inbuf);
+
+  if (err == ERR_OK) {
+    netbuf_data(inbuf, (void**)&buf, &buflen);
+
+    // Check if header starts with "GET /"
+    if (buflen >= 5 && buf[0] == 'G' && buf[1] == 'E' && buf[2] == 'T' && buf[3] == ' ' && buf[4] == '/') {
+      netconn_write(conn, http_html_hdr, sizeof(http_html_hdr) - 1, NETCONN_NOCOPY);
+      netconn_write(conn, http_index_html, sizeof(http_index_html) - 1, NETCONN_NOCOPY);
+    }
+  }
+
+  netconn_close(conn);
+  netbuf_delete(inbuf);
 }
