@@ -1,6 +1,8 @@
 #include "wrapper.h"
 #include "secret/wifi.h"
+
 #include "task_wroomba.h"
+#include "task_udphandler.h"
 
 
 // Static file tag identifier
@@ -61,14 +63,9 @@ void app_main(void) {
     xEventGroupClearBits(xWiFiEventGroup, (BIT_READY | BIT_CONNECTED | BIT_DISCONNECTED));
 
     // Create our main wroomba task
-    BaseType_t xReturned = xTaskCreate(
-        vATaskWroomba,
-        "wroomba",
-        4000, // TODO: Determine actually needed stack depth
-        (void*)1,
-        (2 | portPRIVILEGE_BIT),
-        &xWroombaTask
-    );
+    BaseType_t xReturned;
+    xReturned = xTaskCreate(vATaskUdpHandler, "udp_handler", 4096, NULL, (2 | portPRIVILEGE_BIT), &xUdpHandlerTask);
+    xReturned = xTaskCreate(vATaskWroomba, "wroomba", 4096, NULL, (2 | portPRIVILEGE_BIT), &xWroombaTask);
 
     if (xReturned == pdPASS) {
         ESP_LOGI(TAG, "Successfully created main task");

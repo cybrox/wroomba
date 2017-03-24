@@ -10,6 +10,14 @@
   #include "esp_event_loop.h"
   #include "esp_log.h"
 
+  #include "lwip/err.h"
+  #include "lwip/sockets.h"
+  #include "lwip/sys.h"
+  #include "lwip/opt.h"
+  #include "lwip/arch.h"
+  #include "lwip/api.h"
+  #include "lwip/udp.h"
+
   #include "nvs_flash.h"
 
   #include "driver/gpio.h"
@@ -35,10 +43,12 @@
   
   // System Globals
   mdns_server_t *mdns;
+  struct udp_pcb *udp_server;
 
 
   // System Tasks
   TaskHandle_t xWroombaTask;
+  TaskHandle_t xUdpHandlerTask;
 
 
   // System Event Groups

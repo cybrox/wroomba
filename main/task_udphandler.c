@@ -1,8 +1,8 @@
-#include "task_wroomba.h"
+#include "task_udphandler.h"
 
-static const char* TAG = "wroomba";
+static const char* TAG = "udphandler";
 
-void vATaskWroomba(void *pvParameters) {
+void vATaskUdpHandler(void *pvParameters) {
     // Wait until we have a WiFi connection
     xEventGroupWaitBits(
       xWiFiEventGroup,
@@ -21,17 +21,6 @@ void vATaskWroomba(void *pvParameters) {
       return;
     }
     
-
-    // Set up mDNS broadcasting
-    ESP_ERROR_CHECK(mdns_init(TCPIP_ADAPTER_IF_STA, &mdns));
-    mdns_set_hostname(mdns, "wroomba");
-    mdns_set_instance(mdns, "wroomba");
-
-
-    for(;;) {
-        ESP_LOGI(TAG, "Doing some stuff!");
-        vTaskDelay(SECONDS(10));
-    }
 
     vTaskDelete(NULL);
 }
