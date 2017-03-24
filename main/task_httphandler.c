@@ -47,7 +47,7 @@ void vATaskHttpHandler(void *pvParameters) {
 }
 
 const static char http_html_hdr[] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
-const static char http_index_html[] = "<html><head><title>Congrats!</title></head><body><h1>Welcome to our lwIP HTTP server!</h1><p>This is a small test page, served by httpserver-netconn.</body></html>";
+const static char http_index_html[] = "<h1>wroom!</h1>";
 
 void handle_http_request(struct netconn *conn) {
   struct netbuf *inbuf;
