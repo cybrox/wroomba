@@ -30,6 +30,17 @@ void vATaskWroomba(void *pvParameters) {
     mdns_set_instance(mdns, "wroomba");
 
 
+    // Set up UART transmission and receiving
+    uart_config_t cfg = {
+      .baud_rate = 115200,
+      .data_bits = UART_DATA_8_BITS,
+      .parity = UART_PARITY_DISABLE,
+      .stop_bits = UART_STOP_BITS_1,
+      .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+      .rx_flow_ctrl_thresh = 0
+    };
+
+
     for(;;) {
       xEventGroupWaitBits(
         xCleanEventGroup,
