@@ -26,7 +26,7 @@ void vATaskHttpHandler(void *pvParameters) {
     }
     
 
-    // Start UDP interface
+    // Start HTTP interface
     struct netconn *conn, *newconn;
     err_t err;
 
