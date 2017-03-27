@@ -21,6 +21,7 @@
   #include "nvs_flash.h"
 
   #include "driver/gpio.h"
+  #include "driver/uart.h"
 
   #include "mdns.h"
 
