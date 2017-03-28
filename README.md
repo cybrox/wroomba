@@ -11,3 +11,10 @@ Other than that, you will need:
 
 ### Software
 The software is a standard ESP32 project. Check out [their docs](http://esp-idf.readthedocs.io/en/v1.0/) for more information.
+
+### Usage
+Since for my application, the actual scheduling of tasks is done on a central device. Wroomba merely needs to add an API between that scheduler and the Roomba Open Interface. This Software exposes a very simple HTTP API with the following endpoints:
+- `GET /info` Returns "wroomba!"
+- `POST /clean` Sends `start` + `clean` command to roomba
+
+If you want to use this, please remember to change the WiFi login credentials in `secret/wifi.h`
